@@ -1,4 +1,5 @@
 #install.packages("ez")
+# initial set-up
 library("rARPACK")
 library("psych")
 library("iCluster")
