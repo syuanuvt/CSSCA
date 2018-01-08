@@ -1,7 +1,7 @@
 ## the code for integrated SSCA 
 # Yuan Shuai 2017/5/5
 
-# version control
+# version control yuan shuai
 Sca_common <- function(data_con, nvar, nblock, common){
   
   # known_sparse: whether the sparsity of the data is known (0 = unknown, otherwise the input is the sparsity of the data)
