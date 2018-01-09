@@ -8,5 +8,5 @@ cluster-wise sparse simultaneous component analysis: inlcuding the non-sparse ve
 ## CSCA: the non-sparse version of the cluster-wise sparse simultaneous component analysis
 **SCA common:** (non-sparse version of) simultaneous component analysis for linked data. Fast SVD algorithm is used to compute the solutions, therefore the algorithm could not distinguish between common and specific components (only common components are obtained)
 **final solution_no sparse:** Clusterwise-simultaneous component analysis for linked data. Given the number of components and the number of clusters, the function could compute the cluster assignments of the obervations and the cluster-specific loading matrices
-**variable selection:** 
-**final simulation_non sparse version:** The try-out  
+**variable selection:** determine the best fitted number of components and number of clusters
+**final simulation_non sparse version:** The try-out function for overall monitory simulation
