@@ -1,4 +1,5 @@
-#### validate the variable selection phases
+#### validate the simple version of the variable selection procedure (i.e. purely based on co-variance matrix)
+#### validation of the complete version of the variable selction procedure would be done via the function (ValidateComplete)
 #### the formal version of the methods could be seen in "final simulation"
 
 ############################# the parameters #########################
@@ -34,7 +35,7 @@ iteration <- 1
 
 #########################  data generation ###########################
 for (e in 1:number.testing.clusters){
-  n_cluster <- 3 * e
+  n_cluster <- 5 * e
   mem_cluster <- rep(40, n_cluster)
   n_respondents <- sum(mem_cluster)
   clustermem <- vector()
@@ -63,7 +64,7 @@ for (e in 1:number.testing.clusters){
         seeds[[condition]][times] <- .Random.seed[times]
         set.seed(seeds[[condition]][times])
         toy <- CSSCASimulation.full.mean(n_cluster, mem_cluster, n_com, n_distinct, n_block, n_var, p_sparse, 
-                                         p_noise[1], p_combase, p_fixzero, "both", meanv)
+                                         p_noise, p_combase, p_fixzero, "both", meanv)
         block_version_data <- toy[[1]]
         all_data <- toy[[2]]
         true_score <- toy[[4]]
@@ -73,8 +74,6 @@ for (e in 1:number.testing.clusters){
         used_data[[condition]][[times]] <- list(data = toy, num.cluster = n_cluster, meanv = meanv, num.component = n_com1)
 
         
-        #min_loss <- upper
-        ## start with non-sparse solution
         # first select the number of components and clusters based on csca
         est_csca_cluster <- varsel_nonsparse_full(all_data, n_var, n_block, max_component, max_cluster, n_respondents, iteration)[[1]]
         est_csca_component <- varsel_nonsparse_full(all_data, n_var, n_block, max_component, max_cluster, n_respondents, iteration)[[2]]
