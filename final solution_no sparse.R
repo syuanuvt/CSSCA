@@ -40,8 +40,10 @@ csca <- function(xc, nvar, nblock, all_components, ncluster, nrespondents, itera
   
 for (v in 1:iteration){
   
+  flag <- 0    # flag for breaking the loop
+     
   loss_iteration <- vector("numeric")
-  
+
   # step 1: initialize the cluster assignment
   random_start <- randomstart(start)
   cluster_yn <- random_start$mem
@@ -95,6 +97,13 @@ for (v in 1:iteration){
           ## get the loss function without observation j
           # the data matrix without j
           new_data <- xc[setdiff(current_mem[[k]], j), ]
+          
+          # stop the loop when the new_data contains fewer than two rows
+          if (nrow(new_data) < 3){
+            flag <- 1  # flag for breaking the loop
+            break      # for the loop k
+          }
+          
           # update both the T and P
           # compute the new score matrix (use rational start, only compute one time)
           new_ssca <- Sca_common(new_data, nvar, nblock, all_components)
@@ -137,6 +146,9 @@ for (v in 1:iteration){
         }
       }
       
+      # break the loop j
+      if (flag == 1) break
+        
       # update the cluster membership, loading matrix and the loss function (loss function only for indication) immediately 
       # (only when the member is in differenet cluster)
       if  (cluster_mem[j] == mem_update){
@@ -179,6 +191,9 @@ for (v in 1:iteration){
         cat("Update Loss: ",loss_tot_ind, sep="\n")
       }
     }
+    
+    # break the while loop
+    if (flag == 1) break
     
     # update the cluster membership
     # recompute the score matrix and loading matrix for every cluster
