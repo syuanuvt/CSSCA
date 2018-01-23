@@ -7,8 +7,8 @@
 # the idea is to test whether the algorithm could detect the correct number of clusters and components
 # therefore, the number of clusters and number of components will be treated as variables
 n_block <- 2
-n_var <- c(20, 20)
-n_respondents <- c(40, 40, 40)
+n_var <- c(15, 15)
+#n_respondents <- c(40, 40, 40)
 p_noise <- 0.1
 p_sparse <- 0
 # in the simple version, the mean structure always constructs a minor part of the total structure
@@ -32,9 +32,9 @@ condition <- 0
 number.testing.clusters <- 3
 number.testing.components <- 3 
 # the number of simulations in one certain condition
-number.time <- 1
+number.time <- 5
 # The number of iterations
-iteration <- 1
+iteration <- 20
 
 ################ part4: the recording variables #######################
 
@@ -51,7 +51,7 @@ for (i in 1:number.time){
 
 #########################  data generation ###########################
 for (e in 1:number.testing.clusters){
-  n_cluster <- 5 * e
+  n_cluster <- 4 * e
   mem_cluster <- rep(40, n_cluster)
   n_respondents <- sum(mem_cluster)
   clustermem <- vector()
