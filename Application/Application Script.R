@@ -43,7 +43,6 @@ app4.imputed <- mice::complete(imp)
 # only retain the relevant variables
 app4.imputed <- app4.imputed[, -c(9, 13, 17:18, 22, 24:25, 33:34)]
 # re-scale the original data to have the sum-of-squares of each column(variable) equals to 1 and the column mean equals to 0
-app4.imputed <- scale(app4.imputed, center = TRUE, scale = FALSE)
 app4.imputed <- apply(app4.imputed, 2, function(x) x / sqrt(sum(x ^ 2)))
 save(app4.imputed, file="app4.RData")
 
