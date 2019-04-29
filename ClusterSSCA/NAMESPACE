@@ -1,0 +1,4 @@
+export(Add)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
+useDynLib(ClusterSSCA)
