@@ -35,14 +35,13 @@ List RandomStart_cpp(const arma::vec& input_vector) {
 }
 
 //[[Rcpp::export]]
-arma::mat MatrixCenter_cpp(const arma::mat& input_matrix, const int& center, const int& scale){
+arma::mat MatrixCenter_cpp(const arma::mat input_matrix, const int center, const int scale){
   /* the mean value of the colums are matrix with one row*/
   arma::mat variable_mean = arma::mean(input_matrix, 0);
-  arma::mat variable_sd = arma::stddev(input_matrix, 0);
+
   int n_observation = input_matrix.n_rows;
   int n_variables = input_matrix.n_cols;
   arma::mat output_matrix(n_observation, n_variables);
-
   if (center) {
     for (int i = 0; i < n_variables; i ++){
       for (int j = 0; j < n_observation; j ++){
@@ -51,10 +50,12 @@ arma::mat MatrixCenter_cpp(const arma::mat& input_matrix, const int& center, con
     }
   }
 
+  arma::mat variable_sd = arma::stddev(output_matrix, 0);
+
   if (scale){
     for (int i = 0; i < n_variables; i ++){
       for (int j = 0; j < n_observation; j ++){
-        output_matrix(j, i) = input_matrix(j, i) / variable_sd(0, i);
+        output_matrix(j, i) = output_matrix(j, i) / variable_sd(0, i);
       }
     }
   }

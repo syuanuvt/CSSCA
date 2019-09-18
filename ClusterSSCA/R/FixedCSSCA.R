@@ -1,5 +1,8 @@
-#' CSSCA with fixed values of paramters.
+#' CSSCA with fixed values of paramters. This is an inner calling function,
+#' typically automatically linked without explicit calling
 #'
+#' @name FixedCSSCA
+#' @usage CSSCA with fixed values of paramters. This is an inner calling function, typically automatically linked without explicit calling
 #' @param all_data A matrix with concatenated data (the aggregation of the data blocks by rows (entries)). The CSSCA method will be performed on the data.
 #' @param n_blcok A positive integer indicates the number of data blocks
 #' @param n_com An integer indicates the number of common components
@@ -64,20 +67,25 @@ FixedCSSCA <- function(all_data,n_block, n_com, n_distinct, n_var, n_cluster, p_
   }
 
   # settings of the estimation process
+  if(computation == "test"){
+    partition_times <- 1
+  }
   if(computation == "easy"){
-    partition_small_times <- 10 #the maximum number of replacement when using CSSCA in mean-dominant structure and (or) using iCluster in covariance-dominant structure (i.e. inconsistency of the method and the structure)
-    partition_big_times <- 15 #the maximum number of replacement when using CSSCA in mean-dominant structure and (or) using iCluster in covariance-dominant structure (i.e. consistency of the method and the structrue)
+    partition_times <- 20
   }
 
   if(computation == "medium"){
-    partition_small_times <- 12 #the maximum number of replacement when using CSSCA in mean-dominant structure and (or) using iCluster in covariance-dominant structure (i.e. inconsistency of the method and the structure)
-    partition_big_times <- 20 #the maximum number of replacement when using CSSCA in mean-dominant structure and (or) using iCluster in covariance-dominant structure (i.e. consistency of the method and the structrue)
+    partition_times <- 25
   }
 
   if(computation == "difficult"){
-    partition_small_times <- 15 #the maximum number of replacement when using CSSCA in mean-dominant structure and (or) using iCluster in covariance-dominant structure (i.e. inconsistency of the method and the structure)
-    partition_big_times <- 25 #the maximum number of replacement when using CSSCA in mean-dominant structure and (or) using iCluster in covariance-dominant structure (i.e. consistency of the method and the structrue)
+    partition_times <- 30
   }
+
+  if(computation == "test"){
+    csca_times <- 1
+  }
+
   if(computation == "easy"){
     csca_times <- 20
   }
@@ -117,17 +125,16 @@ FixedCSSCA <- function(all_data,n_block, n_com, n_distinct, n_var, n_cluster, p_
     results2_cssca <- cssca_quick_cpp(all_data, n_var, n_block, n_com, n_distinct, n_cluster, n_observation, p_sparse, results_iclust, cutoff.prop)
 
     ######### CSCA part
-    min_loss_our <- upper
-    if (results1_cssca$loss < min_loss_our) {
-      min_loss_our <- results1_cssca$loss
-      global1 <- results1_cssca
+    min_loss <- upper
+    if (results1_cssca$loss < min_loss) {
+      min_loss<- results1_cssca$loss
+      global <- results1_cssca
     }
 
     ######### iclust part
-    min_loss_iclust <- upper
-    if (results2_cssca$loss < min_loss_iclust) {
-      min_loss_iclust <- results2_cssca$loss
-      global2 <- results2_cssca
+    if (results2_cssca$loss < min_loss) {
+      min_loss <- results2_cssca$loss
+      global <- results2_cssca
     }
 
     # Compare the results of the two rational starts to determine the number of semi-rational starts
@@ -137,37 +144,23 @@ FixedCSSCA <- function(all_data,n_block, n_com, n_distinct, n_var, n_cluster, p_
     #### weight scheme
     ## when covariance similarity < mean similarity, mean structure probably dominates the overall structure
     if (covariance_similarity < mean_similarity){
-      mean <- 1
-      n_partition_csca <- partition_small_times
-      n_partition_iclust <- partition_big_times
+      #### partition for thr mclust part
+      partition_results_iclust <- MainCSSCA(all_data, n_var, n_block, n_com, n_distinct, n_cluster, n_observation, p_sparse, results_iclust, cutoff.prop, partition_times, n_replicate, rate)
+      if (partition_results_iclust$loss < min_loss){
+        min_loss <- partition_results_iclust$loss
+        global <- partition_results_iclust
+      }
     }
     ## when covariance similarity > mean similarity, m=covariance structure probably dominates the overall structure
     if ((covariance_similarity > mean_similarity) | (covariance_similarity = mean_similarity)){
-      mean <- 0
-      n_partition_csca <- partition_big_times
-      n_partition_iclust <- partition_small_times
+      ### partition for the csca part
+      partition_results_csca <- MainCSSCA(all_data, n_var, n_block, n_com, n_distinct, n_cluster, n_observation, p_sparse, results1$cluster_mem, cutoff.prop, partition_times, n_replicate, rate)
+      if (partition_results_csca$loss < min_loss){
+        min_loss <- partition_results_csca$loss
+        global <- partition_results_csca
+      }
     }
 
-    ### partition for the csca part
-    partition_results_csca <- MainCSSCA(all_data, n_var, n_block, n_com, n_distinct, n_cluster, n_observation, p_sparse, results1$cluster_mem, cutoff.prop, n_partition_csca, n_replicate, rate)
-    if (partition_results_csca$loss < min_loss_our){
-      min_loss_our <- partition_results_csca$loss
-      global1 <- partition_results_csca
-    }
-
-    #### partition for thr mclust part
-    partition_results_iclust <- MainCSSCA(all_data, n_var, n_block, n_com, n_distinct, n_cluster, n_observation, p_sparse, results_iclust, cutoff.prop, n_partition_iclust, n_replicate, rate)
-    if (partition_results_iclust$loss < min_loss_iclust){
-      min_loss_iclust <- partition_results_iclust$loss
-      global2 <- partition_results_iclust
-    }
-
-
-    if (min_loss_our < min_loss_iclust){
-      global <- global1
-    }  else {
-      global <- global2
-    }
   }
 
   return(global)

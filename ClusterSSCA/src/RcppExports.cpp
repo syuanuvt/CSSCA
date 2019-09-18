@@ -18,14 +18,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // MatrixCenter_cpp
-arma::mat MatrixCenter_cpp(const arma::mat& input_matrix, const int& center, const int& scale);
+arma::mat MatrixCenter_cpp(const arma::mat input_matrix, const int center, const int scale);
 RcppExport SEXP _ClusterSSCA_MatrixCenter_cpp(SEXP input_matrixSEXP, SEXP centerSEXP, SEXP scaleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type input_matrix(input_matrixSEXP);
-    Rcpp::traits::input_parameter< const int& >::type center(centerSEXP);
-    Rcpp::traits::input_parameter< const int& >::type scale(scaleSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type input_matrix(input_matrixSEXP);
+    Rcpp::traits::input_parameter< const int >::type center(centerSEXP);
+    Rcpp::traits::input_parameter< const int >::type scale(scaleSEXP);
     rcpp_result_gen = Rcpp::wrap(MatrixCenter_cpp(input_matrix, center, scale));
     return rcpp_result_gen;
 END_RCPP

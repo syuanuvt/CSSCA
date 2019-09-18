@@ -104,6 +104,7 @@ CSSCASimulation <- function(ncluster, memcluster, nblock, ncom, ndistinct, nvar,
 
   ## create the initial score matrix
   inidata <- matrix (rnorm(all_member * all_var), nrow = all_member, ncol = all_var)
+  #initial_score <- matrix(nrow = all_member, ncol = all_component)
   true_score <- matrix(nrow = all_member, ncol = all_component)
   initial_p <- list()
 
@@ -113,7 +114,10 @@ CSSCASimulation <- function(ncluster, memcluster, nblock, ncom, ndistinct, nvar,
 
   # generate the cluster-specific score matrix and loading matrix
   for  (i in 1:ncluster){
-    true_score[(sum(cluster_rep[1:i]) + 1):sum(cluster_rep[1:i+1]),] <- matrix(rnorm(memcluster[i] * all_component), nrow = memcluster[i], ncol = all_component)
+    #initial_score[(sum(cluster_rep[1:i]) + 1):sum(cluster_rep[1:i+1]),]
+    score_cluster <- matrix(rnorm(memcluster[i] * all_component), nrow = memcluster[i], ncol = all_component)
+    score.de <- gramSchmidt(score_cluster)
+    true_score[(sum(cluster_rep[1:i]) + 1):sum(cluster_rep[1:i+1]),] <- MatrixCenter_cpp(score.de$Q, 1, 0) * sqrt(nrow(score_cluster))
     # the cluster-specific loading matrix
     specific_p <- matrix(runif(all_var * all_component, min = -1, max = 1), nrow = all_var, ncol = all_component)
     initial_p[[i]] <- scale_common_p + sqrt(1 - pcombase) * sweep(specific_p, 2, sqrt(colSums(specific_p ^ 2)), `/`)
@@ -189,7 +193,7 @@ CSSCASimulation <- function(ncluster, memcluster, nblock, ncom, ndistinct, nvar,
       if (pmean != 1){
 
         # make the row-wise sum-of-square of the loading matrix equals to (1-pmean)
-        loading_per_cluster[[i]] <- sqrt((1-pmean)*(1-pnoise) / mean(apply(loading_per_cluster[[i]] ^ 2, 1, sum))) * loading_per_cluster[[i]]
+        loading_per_cluster[[i]] <- loading_per_cluster[[i]] * sqrt((1-pmean)*(1-pnoise) / mean(apply(loading_per_cluster[[i]] ^ 2, 1, sum)))
       }
     }
   }

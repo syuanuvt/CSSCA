@@ -40,9 +40,9 @@
 #'  p_noise, p_combase, p_fixzero, "both", mean_v)
 #'  calculate the results of CSSCA in various conditions and save the results in the current working directory.
 #'  Note that the function may take up very long time to finish
-#' (not run) VariousCSSCA(sim$concatnated_data, n_block, n_com, n_distinct, n_var, cluster_range, sparse_range, computation = "easy")
+#' (not run) ComputationCSSCA(sim$concatnated_data, n_block, n_com, n_distinct, n_var, cluster_range, sparse_range, computation = "easy")
 
-VariousCSSCA <- function(all_data, n_block, n_com, n_distinct, n_var, ncluster_range, psparse_range, cutoff.prop = 1/6, n_replicate = 3, rate = 1/10, computation = "easy"){
+ComputationCSSCA <- function(all_data, n_block, n_com, n_distinct, n_var, ncluster_range, psparse_range, cutoff.prop = 1/6, n_replicate = 3, rate = 1/10, computation = "easy"){
 
    # number of candidates per parameter
    selection_table <- expand.grid(ncluster = ncluster_range, prob_sparsity = psparse_range)
@@ -51,11 +51,10 @@ VariousCSSCA <- function(all_data, n_block, n_com, n_distinct, n_var, ncluster_r
    no_cores <- detectCores() - 1
    c1 <- makePSOCKcluster(no_cores)
    registerDoParallel(c1)
-   results <- foreach(i = 1:nrow(selection_table),
-                      .packages = c("rARPACK", "psych", "irlba", "mclust",
-                                                            "combinat", "GPArotation",
-                                                            "tidyr", "ez", "dplyr",  "Rcpp",
-                                                            "RcppArmadillo", "iCluster",
+    foreach(i = 1:nrow(selection_table), .verbose = TRUE,
+                      .packages = c( "psych", "irlba", "iCluster", "mclust",
+                                                            "Rcpp",
+                                                            "RcppArmadillo",
                                                             "foreach", "doParallel", "ClusterSSCA"), .combine=rbind) %dopar%{
 
               p_sparse <- selection_table$prob_sparsity[i]

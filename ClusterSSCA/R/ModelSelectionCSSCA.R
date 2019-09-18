@@ -33,6 +33,8 @@
 
 ModelSelectionCSSCA <- function(ncluster_range, psparse_range){
 
+  upper <- 1e9
+
   compute_matrix <- expand.grid(ncluster_select = cluster_range, psparse_select = sparse_range)
   compute_matrix$loss <- rep(0, nrow(compute_matrix))
 
@@ -72,5 +74,7 @@ ModelSelectionCSSCA <- function(ncluster_range, psparse_range){
   }
   opt_psparse <- sparse_range[which(sr.vector == max(sr.vector))+1]
 
-  return (opt_cluster = opt_cluster, opt_psparse = opt_psparse)
+  optimal_solutions <- list(opt_cluster = opt_cluster, opt_psparse = opt_psparse)
+
+  return (optimal_solutions)
 }
