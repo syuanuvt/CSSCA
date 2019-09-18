@@ -9,7 +9,7 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Depends: dplyr,
+Depends: 
     pracma,
     psych,
     iCluster,
@@ -17,9 +17,6 @@ Depends: dplyr,
     mclust,
     Rcpp,
     doParallel,
-    ggplot2,
-    RColorBrewer,
-    combinat,
     RcppArmadillo
 RoxygenNote: 6.1.1
 LinkingTo: Rcpp, RcppArmadillo
