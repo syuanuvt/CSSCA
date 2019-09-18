@@ -1,11 +1,11 @@
-# CSSCA
-cluster-wise sparse simultaneous component analysis: inlcuding the non-sparse version (clusterwise PCA)
+# CSSCA: a brief tutorial of application (current version 0.6.0; accompanying research article currently under review at Social Science Computer Review)
+The package includes most essential functions to carry out the Cluster-wise Sparse Simultaneous Component Analysis and the Cluster-wise Principal Component Analysis (CPCA). 
 
-## Running simulation 
-**simulation function_full_mean**: the full data simulation function, includes the settings of the sparse level, the number of clusters, the cluster assignment, the number of components, the proportion of mean struture to the covariance structure, the noise level, the number of blocks and the number of variables
+## Running simulation with CSSCA model
+**CSSCASimulation**: Data simulation following CSSCA models, as described in Yuan et al., (under review), with the options to specify a full set of parameters, including: (1) the number of clusters, (2) the size of each cluster (allowed to have unbalanced cluster size), (3) the number of common and distinctive components, (4) the number of data blocks, (5) the number of variables in each data block, (6) the sparsity level of the loading matrices, (7) the desirable noise level of the data and (8) the congruence of loading matrices. 
 
-## Clusterwise PCA: hybrid method that includes PCA and clustering. 
-**csca_cpp**:  Clusterwise PCA clusters observation in such a way that the observations belong to the same cluster would have the same loading matrices while the observations belong to different clusters would have different loading matrices. The function is written based on rcpp
+## CPCA: Clustering analysis on single dataset based on both mean structure and component structure  
+**csca_cpp**:  For the users who want to conduct clustering analysis on single data block that accounts for both mean structure and component structure, we have implemented an efficient Cluster-wise Principal Component Analysis (CPCA algorithm). In essence, detect hidden subgroups that possess group-specific centroids and group-specific component loadings) on the single dataset, the ClusterSSCA package also implemented such analysis, which could also be viewed as a special case of CSSCA (i.e., without separating distinctive components and sparseness induced) Clusterwise PCA clusters observation in such a way that the observations belong to the same cluster would have the same loading matrices while the observations belong to different clusters would have different loading matrices. 
 
 ## CSSCA with fixed parameters
 **FixedCSSCA**: a wrapper that estimates the CSSCA results based on fixed parameters (i.e. no model selection provided)
