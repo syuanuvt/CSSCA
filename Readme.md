@@ -1,6 +1,14 @@
 # CSSCA: a brief tutorial of application (current version 0.6.0)
 The package includes most essential functions to carry out the Cluster-wise Sparse Simultaneous Component Analysis and the Cluster-wise Principal Component Analysis (CPCA). 
 
+## Installation
+To use the Package, make sure the R package "devtool" or "remotes" have been installed. Then, use the following code to fomally install the Package ClusterSSCA 
+```{r eval = FALSE}
+# no warnings for dependicy issues
+Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+remotes::install_github("syuanuvt/CSSCA")
+```
+
 ## Running simulation with CSSCA model
 **CSSCASimulation**: Data simulation following CSSCA models, as described in Yuan et al., (under review), with the options to specify a full set of parameters, including: (1) the number of clusters, (2) the size of each cluster (allowed to have unbalanced cluster size), (3) the number of common and distinctive components, (4) the number of data blocks, (5) the number of variables in each data block, (6) the sparsity level of the loading matrices, (7) the desirable noise level of the data and (8) the congruence of loading matrices. 
 
