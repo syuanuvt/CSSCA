@@ -1,4 +1,4 @@
-# CSSCA: a brief tutorial of application (current version 0.6.0; accompanying research article currently under review at Social Science Computer Review)
+# CSSCA: a brief tutorial of application (current version 0.6.0)
 The package includes most essential functions to carry out the Cluster-wise Sparse Simultaneous Component Analysis and the Cluster-wise Principal Component Analysis (CPCA). 
 
 ## Running simulation with CSSCA model
@@ -11,7 +11,7 @@ The package includes most essential functions to carry out the Cluster-wise Spar
 **FixedCSSCA**: a wrapper that estimates the CSSCA results based on fixed parameters (i.e. no model selection provided)
 
 ## CSSCA with model selection
-**VariousCSSCA**: a wrapper that estimates the CSSCA results with varying levels of the parameters. The function will produce the resulting data for each combination of candidating values of the unknown parameters  
+**ComputationCSSCA**: a wrapper that estimates the CSSCA results with varying levels of the parameters. The function will produce the resulting data for each combination of candidating values of the unknown parameters  
 **ModelSelectionCSSCA**: carry out the model selection procedure to automatically select the optimal number of clusters and level of sparsity.
 
 ## Other useful functions
@@ -21,3 +21,7 @@ The package includes most essential functions to carry out the Cluster-wise Spar
 ## Scripts to reproduce the results of the manuscript "Revealing subgroups that differ in common and distinctive variation in multi-block data: Clusterwise Sparse Simultaneous Component Analysis"
 **Application Folder**: process data for the demonstrative application of CSSCA on the linked personality measurements and non-verbal behavior data  
 **Simulation Folder**: Script to create and estimate the two simulation studies (simulation script) and Script to reproduce the tables, figures and other reported numbers of the simulation studies (Simulation Results Processing)
+
+## Planned adds-on
+** Results summary and visualization
+** A tutorial on how to use the package with real datasets
