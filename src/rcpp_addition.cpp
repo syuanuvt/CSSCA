@@ -598,7 +598,6 @@ List IntSparseSca_random_cpp(arma::mat data_con, arma::vec nvar, int nblock, int
   // similar to the
   double min_l = 1000000000;
   int all_var = data_con.n_cols;
-  int all_mem = data_con.n_rows;
   int fixed_zeros_n = fixed_zeros.size();
   int no_fixed_zeros = all_var * all_components - fixed_zeros_n;
 
@@ -723,13 +722,10 @@ List cssca_quick_cpp(arma::mat data_con, arma::vec nvar, int nblock,
   int all_components = n_distinct + common;
 
   int flag = 0;
-  // most iteration time for one single start
-  int maxiter = 100;
+
   // loop index
   int i = 0;
   int j = 0;
-  int k = 0;
-  int l = 0;
 
   // create the loading sparsity structure
   arma::vec distinct_index(n_distinct);
@@ -755,9 +751,6 @@ List cssca_quick_cpp(arma::mat data_con, arma::vec nvar, int nblock,
     arma::uvec temp_zeros = arma::linspace<arma::uvec>((all_var * (common + i) + sum_var(distinct_index(i) - 1) + 1), (all_var * (common + i) + sum_var(distinct_index(i))), (sum_var(distinct_index(i)) - sum_var(distinct_index(i) - 1)));
     distinct_zeros = join_cols(distinct_zeros, temp_zeros);
   }
-
-  //set the upper bound of minimum loss
-  double loss_min = upper;
 
   // the records
   arma::vec loss_iteration;
