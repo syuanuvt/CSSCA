@@ -1,3 +1,10 @@
+---
+title: "ClusterSSCA: A Brief Tutorial (Current Version 0.6.0)"
+output:
+  github_document:
+    pandoc_args: --webtex
+---
+
 # ClusterSSCA: A Brief Tutorial (Current Version 0.6.0)
 The package includes most essential functions to carry out the Cluster-wise Sparse Simultaneous Component Analysis (CSSCA) and the Cluster-wise Principal Component Analysis (CPCA). To learn more about the technical details of CSSCA, or to cite the methods in your publication, please kindly refer to the following citation. CPCA is a special case of CSSCA that should be used to analyze on the datasets with only single data block and its resulting component loading matrices are without sparseness. However, comparing to CSSCA, CPCA enjoys substantial computational advantages. We recommend the users to apply CPCA if both conditions are met: (1) the data contains only one single data block and (2) non-sparseness component loadings are desired. 
 
