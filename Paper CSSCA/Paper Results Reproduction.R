@@ -3,12 +3,9 @@ library("rARPACK")
 library("psych")
 library("irlba")
 library("mclust")
-#install.packages("combinat")
 library("combinat")
-#install.packages("GPArotation")
 library("GPArotation")
 library("tidyr")
-#install.packages("ez")
 library("dplyr")
 library("mclust")
 library("ggplot2")
@@ -18,7 +15,6 @@ library("foreach")
 library("doParallel")
 library("ClusterSSCA")
 library("apaTables")
-#install.packages("MBESS")
 library(MBESS)
 library(reshape2)
 library(jtools)
@@ -27,10 +23,10 @@ library("plotrix")
 #########################################################################################
 ################################# Simulation Studies ####################################
 ##################################### Sim 1 #############################################
-######## important note: Due to the hardware avilability, we have run the sim1 on two 
+######## important note: Due to the hardware avilability, we have run the sim1 on two
 ######## separate PC, devided by the two levels of the factor clustersize
 ######## follows is the code when level = 1 (large-scale data); the exact same code
-######## is used for another half of the analysis with the only difference that 
+######## is used for another half of the analysis with the only difference that
 ######## number of observations in each cluster equals 50 or 30
 #########################################################################################
 setwd("~/sim1_data1")
@@ -80,8 +76,8 @@ results_sim1_data1 <- foreach(i = 1:nrow(design_matrix_replication),
                                              "tidyr",  "dplyr",  "Rcpp",
                                              "RcppArmadillo", "iCluster",
                                              "foreach", "doParallel", "ClusterSSCA"), .combine=rbind) %dopar%{
-                                               
-                                               
+
+
                                                # set the specific values of the parameters
                                                largenvar <- design_matrix_replication$n_var[i]
                                                ncluster <- design_matrix_replication$n_cluster[i]
@@ -90,7 +86,7 @@ results_sim1_data1 <- foreach(i = 1:nrow(design_matrix_replication),
                                                mean <- design_matrix_replication$mean_level[i]
                                                cong <- design_matrix_replication$cong_level[i]
                                                memequal <- design_matrix_replication$mem_equal[i]
-                                               
+
                                                # the number of variables
                                                # low dimensions
                                                if(largenvar == 0){
@@ -100,7 +96,7 @@ results_sim1_data1 <- foreach(i = 1:nrow(design_matrix_replication),
                                                if (largenvar == 1){
                                                  nvar <- c(15, 50)
                                                }
-                                               
+
                                                # the number of observations in each cluster
                                                # in the cases that the cluster size is small, each cluster has 50 or 30 observations
                                                if (memequal == 1){
@@ -109,22 +105,22 @@ results_sim1_data1 <- foreach(i = 1:nrow(design_matrix_replication),
                                                if (memequal == 0){
                                                  cluster_mem <- c(rep(100, (ncluster - 1)), 60)
                                                }
-                                               
-                                               
+
+
                                                # data simulation
                                                sim_data <- CSSCASimulation(ncluster, cluster_mem, nblock, ncom,
                                                                            distinct, nvar, psparse, pnoise, cong, cong, "both", mean)
-                                               
+
                                                block_data <- sim_data[[1]]
                                                all_data <- sim_data[[2]]
                                                loadings <- sim_data[[4]]
                                                cluster_assign <- sim_data[[5]]
-                                               
+
                                                # cluster analysis with iCluster and examine the clustering accuracy
                                                icluster_results <- iCluster2(block_data, ncluster)$clusters
                                                # r1 represents the similarities between the estimated partitons of iCluster and the true partitions
                                                r1 <- adjustedRandIndex(cluster_assign, icluster_results)
-                                               
+
                                                # the average congruence between the loading matrices
                                                n <- 0
                                                sum <- 0
@@ -136,37 +132,37 @@ results_sim1_data1 <- foreach(i = 1:nrow(design_matrix_replication),
                                                }
                                                # r2 represents the average congruence between cluster-specific true loading matrices
                                                r2 <- sum / n
-                                               
-                                               
+
+
                                                start.time <- proc.time()
                                                # computation with CSSCA (i.e. same procedures as described in FixedCSSCA)
                                                n_observation <- nrow(all_data)
-                                               
+
                                                results1 <- csca_cpp(all_data, nvar, nblock, n_total, ncluster, csca_times)
-                                               
+
                                                # the two rational starts
                                                results1_cssca <- cssca_quick_cpp(all_data, nvar, nblock, ncom, distinct, ncluster, nrow(all_data), psparse, results1$cluster_mem, 1/6)
                                                results2_cssca <- cssca_quick_cpp(all_data, nvar, nblock, ncom, distinct, ncluster, nrow(all_data), psparse, icluster_results, 1/6)
-                                               
+
                                                # Compare the results of the two rational starts to determine the number of semi-rational starts
                                                covariance_similarity <- adjustedRandIndex(results1$cluster_mem, results1_cssca$cluster_mem)
-                                               
+
                                                # compare between icluster and cssca
                                                mean_similarity <- adjustedRandIndex(icluster_results, results2_cssca$cluster_mem)
-                                               
+
                                                ######### CSCA part
                                                min_loss <- upper
                                                if (results1_cssca$loss < min_loss) {
                                                  min_loss <- results1_cssca$loss
                                                  global <- results1_cssca
                                                }
-                                               
+
                                                ######### iclust paat
                                                if (results2_cssca$loss < min_loss) {
                                                  min_loss <- results2_cssca$loss
                                                  global <- results2_cssca
                                                }
-                                               
+
                                                #### weight scheme
                                                ## when covariance similarity < mean similarity, mean structure probably dominates the overall structure
                                                if (covariance_similarity < mean_similarity){
@@ -186,24 +182,24 @@ results_sim1_data1 <- foreach(i = 1:nrow(design_matrix_replication),
                                                    global <- partition_results_csca
                                                  }
                                                }
-                                               
+
                                                ## summary of the results
                                                est_loadings <- global$loadings
                                                est_loss <- global$loss
                                                est_cluster_mem <- global$cluster_mem
-                                               
+
                                                # r3 represents the average congruence between the estimated loadings and true loadings
                                                r3 <- ListCongruence(loadings, est_loadings, ncluster)
                                                # r4 represents the similarities between the estimated cluster partition of CSSCA and the true cluster partition
                                                r4 <- adjustedRandIndex(est_cluster_mem, cluster_assign)
                                                values <- c(r1, r2, mean(r3), r4, est_loss)
-                                               
+
                                                dur.time <- proc.time() - start.time
                                                # save data
                                                out <- list(all_data = all_data, sim_loadings = loadings, sim_assign = cluster_assign, est = global, values = values, time = dur.time)
-                                               
+
                                                save(out, file=paste0(i, ".RData"))
-                                               
+
                                              }
 stopCluster(c1)
 
@@ -230,7 +226,7 @@ design_matrix <- expand.grid(n_var = n_var, n_cluster = n_cluster, mem_equal = m
                              cong_level = cong_level, cluster_size = cluster_size)
 design_matrix_replication <- expand.grid(n_var = n_var, n_cluster = n_cluster, mem_equal = mem_equal,
                                          p_sparse = p_sparse, p_noise = p_noise, mean_level = mean_level,
-                                         cong_level = cong_level, replication = replication, 
+                                         cong_level = cong_level, replication = replication,
                                          cluster_size = cluster_size)
 # 0 = small, 1 = large
 
@@ -330,7 +326,7 @@ a <- design_matrix_replication %>%
   group_by(mean_level,p_noise) %>%
   dplyr::summarise(cssca.mean = mean(cssca), cssca.sd = sd(cssca))
 
-# the average congruence between the original loading matrices and the estimated loading matrices 
+# the average congruence between the original loading matrices and the estimated loading matrices
 design_matrix_replication_factor %>%
   dplyr::summarise(cong.mean = mean(loading_cong), cong.sd = sd(loading_cong))
 
@@ -348,18 +344,18 @@ compare_results_sim1_se <- design_matrix_replication %>%
   group_by(mean_level) %>%
   dplyr::summarise(iCluster = std.error(icluster), CSSCA = std.error(cssca))
 
-## plot the results 
+## plot the results
 compare_long_mean <- melt(compare_results_sim1_mean, id.vars = "mean_level")
 compare_long_se <- melt(compare_results_sim1_se, id.vars = "mean_level")
 compare_long_mean <- cbind(compare_long_mean, compare_long_se$value)
 colnames(compare_long_mean) <- c("b", "Methods", "average_ARI", "se")
 
 cbPalette <- c("#999999", "#000000")
-ggplot(aes(x = b, y = average_ARI, group = Methods, color = Methods), data = compare_long_mean) + 
-  geom_point() + 
-  geom_line() + 
-  geom_errorbar(aes(ymin = average_ARI - 1.96 * se, ymax = average_ARI + 1.96 * se), width = .1, size = .5, position = position_dodge(0.05)) + 
-  #scale_color_brewer(palette = "Paired") + 
+ggplot(aes(x = b, y = average_ARI, group = Methods, color = Methods), data = compare_long_mean) +
+  geom_point() +
+  geom_line() +
+  geom_errorbar(aes(ymin = average_ARI - 1.96 * se, ymax = average_ARI + 1.96 * se), width = .1, size = .5, position = position_dodge(0.05)) +
+  #scale_color_brewer(palette = "Paired") +
   labs(x = "Proportion of mean-level differences b", y = "Average ARI") +
   theme_apa(legend.pos = "right", legend.use.title = TRUE) +
   scale_colour_manual(values=cbPalette) +
@@ -414,12 +410,12 @@ results_design <- vector(length = nrow(design_matrix))
 
 # simulate a total of 96 datasets that represent the combinations of different values of parameters
 for (i in 1:nrow(design_matrix)){
-  
+
   # creaete and check
   subDir <- paste0(i, "dataset")
   dir.create(file.path(mainDir, subDir))
   setwd(file.path(mainDir, subDir))
-  
+
   # first create the simulations
   # variables in specific settings
   ncluster <- design_matrix$n_cluster[i]
@@ -436,18 +432,18 @@ for (i in 1:nrow(design_matrix)){
   if (dim.size == 1){
     nvar <- c(15, 50)
   }
-  
+
   cluster_mem <- rep(50, ncluster)
-  
+
   # data simulation
   sim_data <- CSSCASimulation(ncluster, cluster_mem, nblock, ncom,
                               distinct, nvar, psparse, pnoise, cong, cong, "both", mean)
-  
+
   block_data <- sim_data[[1]]
   all_data <- sim_data[[2]]
   loadings <- sim_data[[4]]
   cluster_assign <- sim_data[[5]]
-  
+
   # the average congruence between the loading matrices
   n <- 0
   sum <- 0
@@ -458,7 +454,7 @@ for (i in 1:nrow(design_matrix)){
     }
   }
   results_design[i] <- sum / n
-  
+
   out <- list(all_data = all_data, block_data = block_data, sim_loadings = loadings, sim_assign = cluster_assign)
   save(out, file="sim.RData")
 }
@@ -480,12 +476,12 @@ foreach(i = (nrow(compute_matrix_replication) / 2):nrow(compute_matrix_replicati
                       "tidyr", "ez", "dplyr",  "Rcpp",
                       "RcppArmadillo", "iCluster",
                       "foreach", "doParallel", "ClusterSSCA")) %dopar%{
-                        
+
                         iter <- compute_matrix_replication$index[i]
                         iter.ind <- compute_matrix_replication$ind[i]
                         subDir <- paste0(iter, "dataset")
                         setwd(file.path(mainDir, subDir))
-                        
+
                         # variables in specific settings
                         ncluster <- compute_matrix_replication$ncluster_select[i]
                         psparse <- compute_matrix_replication$psparse_select[i]
@@ -493,7 +489,7 @@ foreach(i = (nrow(compute_matrix_replication) / 2):nrow(compute_matrix_replicati
                         mean <- design_matrix$mean_level[iter]
                         cong <- design_matrix$cong_level[iter]
                         dim.size <- design_matrix$dim[i]
-                        
+
                         # small-size data
                         if (dim.size == 0){
                           nvar <- c(15, 15)
@@ -502,12 +498,12 @@ foreach(i = (nrow(compute_matrix_replication) / 2):nrow(compute_matrix_replicati
                         if (dim.size == 1){
                           nvar <- c(15, 50)
                         }
-                        
+
                         # load the data
                         load(file="sim.RData")
                         all_data <- out[[1]]
                         block_data <- out[[2]]
-                        
+
                         # additional information from the input
                         sum_var <- sum(nvar)
                         # create the structure of loading matrices
@@ -523,7 +519,7 @@ foreach(i = (nrow(compute_matrix_replication) / 2):nrow(compute_matrix_replicati
                         for (r.distinct in 1:sum(distinct)){
                           distinct_zeros <- c(distinct_zeros, ((sum_var * (ncom + r.distinct - 1)) + all_var[distinct_index[r.distinct]] + 1): ((sum_var * (ncom + r.distinct - 1)) + all_var[(distinct_index[r.distinct] + 1)]))
                         }
-                        
+
                         # computation with CSSCA
                         n_observation <- nrow(all_data)
                         if(ncluster == 1){
@@ -532,12 +528,12 @@ foreach(i = (nrow(compute_matrix_replication) / 2):nrow(compute_matrix_replicati
                           save(out, file=paste0(iter.ind, ".RData"))
                         }
                         if(ncluster != 1){
-                          
+
                           # cluster analysis with iCluster and examine the clustering accuracy
                           icluster_results <- iCluster2(block_data, ncluster)$clusters
                           # r1 represents the similarities between the estimated partitons of iCluster and the true partitions
                           r1 <- adjustedRandIndex(cluster_assign, icluster_results)
-                          
+
                           # the average congruence between the loading matrices
                           n <- 0
                           sum <- 0
@@ -549,37 +545,37 @@ foreach(i = (nrow(compute_matrix_replication) / 2):nrow(compute_matrix_replicati
                           }
                           # r2 represents the average congruence between cluster-specific true loading matrices
                           r2 <- sum / n
-                          
-                          
+
+
                           start.time <- proc.time()
                           # computation with CSSCA (i.e. same procedures as described in FixedCSSCA)
                           n_observation <- nrow(all_data)
-                          
+
                           results1 <- csca_cpp(all_data, nvar, nblock, n_total, ncluster, csca_times)
-                          
+
                           # the two rational starts
                           results1_cssca <- cssca_quick_cpp(all_data, nvar, nblock, ncom, distinct, ncluster, nrow(all_data), psparse, results1$cluster_mem, 1/6)
                           results2_cssca <- cssca_quick_cpp(all_data, nvar, nblock, ncom, distinct, ncluster, nrow(all_data), psparse, icluster_results, 1/6)
-                          
+
                           # Compare the results of the two rational starts to determine the number of semi-rational starts
                           covariance_similarity <- adjustedRandIndex(results1$cluster_mem, results1_cssca$cluster_mem)
-                          
+
                           # compare between icluster and cssca
                           mean_similarity <- adjustedRandIndex(icluster_results, results2_cssca$cluster_mem)
-                          
+
                           ######### CSCA part
                           min_loss <- upper
                           if (results1_cssca$loss < min_loss) {
                             min_loss <- results1_cssca$loss
                             global <- results1_cssca
                           }
-                          
+
                           ######### iclust paat
                           if (results2_cssca$loss < min_loss) {
                             min_loss <- results2_cssca$loss
                             global <- results2_cssca
                           }
-                          
+
                           #### weight scheme
                           ## when covariance similarity < mean similarity, mean structure probably dominates the overall structure
                           if (covariance_similarity < mean_similarity){
@@ -599,15 +595,15 @@ foreach(i = (nrow(compute_matrix_replication) / 2):nrow(compute_matrix_replicati
                               global <- partition_results_csca
                             }
                           }
-                          
+
                           ## summary of the results
                           est_loadings <- global$loadings
                           est_loss <- global$loss
                           est_cluster_mem <- global$cluster_mem
-                          
+
                           # save data
                           out <- list(loss = est_loss, est = global, icluster_results = icluster_results)
-                          
+
                           save(out, file=paste0(iter.ind, ".RData"))
                         }
                       }
@@ -625,7 +621,7 @@ stopCluster(c1)
   nblock <- 2
   ncom <- 2
   distinct <- c(1, 1)
-  
+
   # factorial design (overall 48 conditions)
   n_cluster <- c(2, 4)
   p_sparse <- c(0.3, 0.7)
@@ -634,31 +630,31 @@ stopCluster(c1)
   cong_level <- c(0, 0.7)
   dim <- c(0,1)
   replication <- 1:6
-  
+
   # the possible ranges of the values to be selected
   cluster_range <- 1:7
   sparse_range <- seq(0.2, 0.8, by = 0.1)
-  
+
   # additional information from the input
   n_total <- sum(ncom, distinct)
-  
+
   # running information
   partition_times <- 20
   csca_times <- 25
   upper <- 1e9
-  
+
   # specify the main directory, and the simulated datasets will be stored in the sub-directory
   mainDir <- "~/sim2"
   # matrix that indicates the specific parameter setting of each condition
   design_matrix <- expand.grid(n_cluster = n_cluster, dim = dim,
                                p_sparse = p_sparse, p_noise = p_noise, mean_level = mean_level,
                                cong_level = cong_level, replication = replication)
-  
+
   # the matrix that records th results of the estimation
   compute_matrix <- expand.grid(ncluster_select = cluster_range, psparse_select = sparse_range)
   compute_matrix$loss <- rep(0, nrow(compute_matrix))
   compute_matrix$vaf <- rep(0, nrow(compute_matrix))
-  
+
   # we will store the results of each condition in a list
   result_matrix <- list()
   ## restore the loss function values in the new matrix
@@ -679,7 +675,7 @@ stopCluster(c1)
   result_matrix_summary$cluster_select <- rep(0, nrow(design_matrix))
   ## the selected level of sparsity
   result_matrix_summary$sparse_select <- rep(0, nrow(design_matrix))
-  
+
   for (k in 1:nrow(design_matrix)){
     dataset1 <- result_matrix[[k]]
     # copy the dataset
@@ -687,7 +683,7 @@ stopCluster(c1)
     sr.result <- matrix(nrow = length(sparse_range), ncol = (length(cluster_range) - 2))
     # when the algorithm does not end normally, the result is set at NA
     a$loss[which(a$loss == upper)] <- NA
-    ## first select the optimal number of clusters for each dataset, 
+    ## first select the optimal number of clusters for each dataset,
     ## following the model selection procedures described in the paper
     ## with the comparison of the average scree ratios across all possible values of level of sparsity
     for (i in 1:length(sparse_range)){
@@ -702,7 +698,7 @@ stopCluster(c1)
     }
     sum <- apply(sr.result, 2, sum, na.rm = TRUE)
     opt_cluster <- cluster_range[which(sum == max(sum)) + 1]
-    ## Conditional on the optimal value of the nuber of cluster, 
+    ## Conditional on the optimal value of the nuber of cluster,
     ## select the optimal number of sparsity for each dataset
     filter.data <- dataset1 %>%
       dplyr::filter(ncluster_select == opt_cluster) %>%
@@ -723,11 +719,11 @@ stopCluster(c1)
     result_matrix_summary$cluster_select[k] <- opt_cluster
     result_matrix_summary$sparse_select[k] <- opt_psparse
   }
-  
+
   ## create loogical values to indicate whether the model selection procedure selects the true model parameter
   result_matrix_summary$cluster_cor <- result_matrix_summary$n_cluster == result_matrix_summary$cluster_select
   result_matrix_summary$sparse_cor <- result_matrix_summary$p_sparse == result_matrix_summary$sparse_select
-  
+
   ## analysis on the predictive powewrs of various factors
   both <- sum(result_matrix_summary$cluster_cor & result_matrix_summary$sparse_cor)
   both / 576
@@ -737,12 +733,12 @@ stopCluster(c1)
   only.sparse <- sum(!result_matrix_summary$cluster_cor & result_matrix_summary$sparse_cor)
   only.sparse
   only.sparse / 576
-  
+
   # Check the performance of succesful selections of paramters as function of various parameters
   result_matrix_summary %>%
     group_by(mean_level) %>%
     summarize(a = sum(cluster_cor & sparse_cor))
-  
+
 ##########################################################################
 ############## Create the dataset that is to be analyzed #################
 ##########################################################################
@@ -751,14 +747,14 @@ stopCluster(c1)
 load("~/application.RData")
 data.app <- data.app[,3:ncol(data.app)]
 ## set up the parameters
-nblock <- 2 # number of blocks 
+nblock <- 2 # number of blocks
 nvar <- c(6, 18) # number of variables in each data block
 ncom <- 2 # number of common components
 distinct <- c(1,1) # number of distinct components
 n_total <- ncom+sum(distinct)
 sum_var <- sum(nvar)
 p_sparse_select <- seq(0,0.9,0.1) # possible values of sparsity
-n_cluster_select <- 1:8 
+n_cluster_select <- 1:8
 
 # running information
 partition_times <- 20 #the maximum number of replacement when using CSSCA in mean-dominant structure and (or) using iCluster in covariance-dominant structure (i.e. inconsistency of the method and the structure)
@@ -799,12 +795,12 @@ foreach(i = 1:nrow(design_matrix),
                       "tidyr", "ez", "dplyr",  "Rcpp",
                       "RcppArmadillo", "iCluster",
                       "foreach", "doParallel", "ClusterSSCA")) %dopar%{
-                        
+
                         # variables in specific settings
                         ncluster <- design_matrix$ncluster_select[i]
                         psparse <- design_matrix$psparse_select[i]
-                  
-                        
+
+
                         #if(!file.exists(paste0(i, ".RData"))){
                           # computation with CSSCA
                           n_observation <- nrow(all_data)
@@ -815,27 +811,27 @@ foreach(i = 1:nrow(design_matrix),
                             save(out, file=paste0(i, ".RData"))
                           }
                           if(ncluster != 1){
-                            
+
                             icluster_results <- iCluster2(block_data, ncluster)$clusters
                             results1 <- csca_cpp(all_data, nvar, nblock, n_total, ncluster, csca_times)
-                            
+
                             # the two rational starts
                             results1_cssca <- cssca_quick_cpp(all_data, nvar, nblock, ncom, distinct, ncluster, nrow(all_data), psparse, results1$cluster_mem, 1/6)
                             results2_cssca <- cssca_quick_cpp(all_data, nvar, nblock, ncom, distinct, ncluster, nrow(all_data), psparse, icluster_results, 1/6)
-                            
+
                             # Compare the results of the two rational starts to determine the number of semi-rational starts
                             covariance_similarity <- adjustedRandIndex(results1$cluster_mem, results1_cssca$cluster_mem)
-                            
+
                             # compare between icluster and cssca
                             mean_similarity <- adjustedRandIndex(icluster_results, results2_cssca$cluster_mem)
-                            
+
                             min_loss <- upper
                             ######### CSCA part
                             if (results1_cssca$loss < min_loss) {
                               min_loss <- results1_cssca$loss
                               global <- results1_cssca
                             }
-                            
+
                             ######### iclust paat
                             if (results2_cssca$loss < min_loss) {
                               min_loss <- results2_cssca$loss
@@ -860,21 +856,21 @@ foreach(i = 1:nrow(design_matrix),
                                 global <- partition_results_csca
                               }
                             }
-                            
-                            
+
+
                             ## summary of the results
                             est_loadings <- global$loadings
                             est_loss <- global$loss
                             est_cluster_mem <- global$cluster_mem
-                            
+
                             # save data
                             out <- list(loss = est_loss, est = global, icluster_results = icluster_results)
-                            
+
                             save(out, file=paste0(i, ".RData"))
                           }
                         }
-                        
-                        
+
+
                       #}
 stopCluster(c1)
 
@@ -917,10 +913,10 @@ opt_cluster <- n_cluster_select[which(sum == max(sum)) + 1]
 filter.data <- a %>%
   dplyr::filter(ncluster_select == opt_cluster) %>%
   dplyr::select(loss)
-filter.data <- as.matrix(filter.data)  
+filter.data <- as.matrix(filter.data)
 #filter.data$loss[which(filter.data$loss == 0)] <- 10000
 sr.vector <- rep(0, (length(p_sparse_select)-2))
-#### select the number of clusters based on non-sparse solution 
+#### select the number of clusters based on non-sparse solution
 for (j in 1:(length(p_sparse_select)-2)){
   sr.vector[j] <- (filter.data[j+2] - filter.data[j+ 1]) / (filter.data[j+1] - filter.data[j])
 }
