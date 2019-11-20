@@ -21,7 +21,7 @@
 #' @examples
 #' the setting for simulation and calculation
 #' n_cluster <- 3
-#' mem_cluster <- c(50,50,50) # 50 entries in each cluster
+#' mem_cluster <- c(30,30,30)# 50 entries in each cluster
 #' n_obs <- sum(mem_cluster)
 #' n_block <- 2
 #' n_com <- 2
