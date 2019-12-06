@@ -1,7 +1,7 @@
-#' Calculate the CSSCA results in various conditions. Note that because of the large scale of the output, it is recommend to retain sufficient internal storage space for the current function.
-#' To guaratee that the model selection algorithm could work properly, it is require to have at least 4 elements in the selection range
-#' Note that the function would automatically do parallel computations use the multiple core of the computer
+#' Calculate the CSSCA results in various conditions.
 #'
+#' @name ComputationCSSCA
+#' @usage Calculate the CSSCA results (especially the loss functions) in all possible conditions.
 #' @param all_data A matrix with concatenated data (the aggregation of the data blocks by rows (entries)). The CSSCA method will be performed on the data.
 #' @param n_blcok A positive integer indicates the number of blocks (i.e. the number of data sources)
 #' @param n_com A positive integer indicates the number of common components

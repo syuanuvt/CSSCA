@@ -1,6 +1,6 @@
 
 # ClusterSSCA: A Brief Tutorial (Current Version 0.6.0)
-The package includes most essential functions to carry out the Cluster-wise Sparse Simultaneous Component Analysis (CSSCA) and the Cluster-wise Principal Component Analysis (CPCA). To learn more about the technical details of CSSCA, or to cite the methods in your publication, please kindly refer to the following citation. CPCA is a special case of CSSCA that should be used to analyze on the datasets with only single data block and its resulting component loading matrices are without sparseness. However, comparing to CSSCA, CPCA enjoys substantial computational advantages. We recommend the users to apply CPCA if both conditions are met: (1) the data contains only one single data block and (2) non-sparseness component loadings are desired. 
+The package includes most essential functions to carry out the Cluster-wise Sparse Simultaneous Component Analysis (CSSCA). To learn more about the technical details of CSSCA, or to cite the methods in your publication, please kindly refer to the following citation. 
 
 ## citation
 ```
@@ -49,23 +49,13 @@ CSSCASimulation(n_cluster, mem_cluster, n_block, n_com, n_distinct, n_var, p_spa
 
 (1) Check whether the assumptions of CSSCA () are what you expect and whether the required values of the parameters are available.
 
-As should be done for any other analyses, we strongly advise the users to first examine whether CSSCA  analyses could address the research questions properly and whether the assumptions underlying the CSSCA model are at least reasonable for the application therein. Most importantly, CSSCA assumes that *the same set of subgroups differ in both mean structure and co-variance structure*. Therefore, the methods would *NOT* be suitable if the user only expect mean differences among clusters (in which cases we would suggest the alternative methods (i.e. K-means) to avoid over-fitting) nor could CSSCA detects different clusters with regard to the mean structure and the convariance structure. Another important assumption is that *the same amount of common and distinctive components, which should be supplied by the user, pertain to all clusters*. Therefore, the current method would only be applicable in case the users have solid theoritical expectations towards the underlying structure of the components (we are currently developing new methods to relax such constraints, and will update the package when avilable). Last, as we have briefly discussed in the paper, *the performance of CSSCA and CPCA deteriorates with increasing level of noise (unsatisfying results would be expected with 40% or higher amount of noise)*. Users are advised to take additional care if their data is prone to high level of noise.
+As should be done for any other analyses, we strongly advise the users to first examine whether CSSCA  analyses could address the research questions properly and whether the assumptions underlying the CSSCA model are at least reasonable for the application therein. Most importantly, CSSCA assumes that *the same set of subgroups differ in both mean structure and co-variance structure*. Therefore, the methods would *NOT* be suitable if the user only expect mean differences among clusters (in which cases we would suggest the alternative methods (i.e. K-means) to avoid over-fitting) nor could CSSCA detects different clusters with regard to the mean structure and the convariance structure. Another important assumption is that *the same amount of common and distinctive components, which should be supplied by the user, pertain to all clusters*. Therefore, the current method would only be applicable in case the users have solid theoritical expectations towards the underlying structure of the components (we are currently developing new methods to relax such constraints, and will update the package when avilable). Last, as we have briefly discussed in the paper, *the performance of CSSCA deteriorates with increasing level of noise (unsatisfying results would be expected with 40% or higher amount of noise)*. Users are advised to take additional care if their data is prone to high level of noise.
 
 (2) Define the parameters that are needed to run CSSCA: specify *the number of common components that underlie all data blocks and the number of disticntive components that underlie each data block* that underlie all clusters. 
 
-(3) If the number of clusters k and the desired level of sparsity S (in case of CSSCA) are known or fixed by the user, FixedCSSCA could be directly used to estimate CSSCA results and FixedCPCA could be used to estimate CPCA results.  
+(3) If the number of clusters k and the desired level of sparsity S (in case of CSSCA) are known or fixed by the user, FixedCSSCA could be directly used to estimate CSSCA results.
 
-(4) If the number of clusters k and the desired level of sparsity S (in case of CSSCA) are *NOT* known or fixed by the user, a model selection procedure should first be applied to select the optimal value for each parameter. The model selection procedure is wrapped in the function ModelSelectionCSSCA and ModelSelectionCPCA. FixedCSSCA and FixedCPCA could then be used to estimate the CSSCA and CPCA solution, given the optimal values of the tuning paramter. Note that in the current version, an important drawback is that the *minimal and maximal values of k and S could not be selected*. As a result, *the current procedure prohibits the selection of one cluster and non-sparseness*, two particular yet important scenerio. We are currently testing alternative model selection scheme that would enable the selection of such extreme values. 
-
-## CPCA analysis on single-block (or concatenated) datasets (to be completed)
-
-### Functions
-
-**FixedCPCA**: a wrapper that estimates the CPCA results with fixed levels of the parameters. 
-
-### Example
-
-
+(4) If the number of clusters k and the desired level of sparsity S (in case of CSSCA) are *NOT* known or fixed by the user, a model selection procedure should first be applied to select the optimal value for each parameter. The model selection procedure is wrapped in the function ModelSelectionCSSCA. FixedCSSCA could then be used to estimate the CSSCA and CPCA solution, given the optimal values of the tuning paramter. Note that in the current version, an important drawback is that the *minimal and maximal values of k and S could not be selected*. As a result, *the current procedure prohibits the selection of one cluster and non-sparseness*, two particular yet important scenerios. We are currently testing alternative model selection scheme that would enable the selection of such extreme values. 
 
 ## CSSCA analysis on multi-block datasets (when the tuning parameters are known)
 
@@ -104,13 +94,6 @@ select.opt <- ModelSelectionCSSCA(ncluster_range, psparse_range)
 ## use the values of the tuning paramters to re-estimate the fixed effects 
 results_opt <- FixedCSSCA(target_data, n_block, n_com, n_distinct, n_var, select.opt[[1]],  select.opt[[2]])
 ```
-
-## CPCA with model selection (when the tuning parameters are not known): to be completed 
-
-### Functions
-
-### Examples
-
 
 ## miscellaneous
 
