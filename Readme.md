@@ -37,7 +37,7 @@ p_sparse <- 0.5  # level of sparsity
 p_noise <- 0.3  # level of noise 
 p_combase <- 0.5 # congruence level of the loading matrices 
 p_fixzero <- 1 # we assume the positions of zero loadings are identical across different clusters 
-mean  <- 0.1 # the proportion of the mean structure in total cluster differences 
+mean_v  <- 0.1 # the proportion of the mean structure in total cluster differences 
 
 CSSCASimulation(n_cluster, mem_cluster, n_block, n_com, n_distinct, n_var, p_sparse,
  p_noise, p_combase, p_fixzero, "both", mean_v)
