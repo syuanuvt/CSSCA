@@ -4,11 +4,11 @@ The package includes most essential functions to carry out the Cluster-wise Spar
 
 ## citation
 ```
-S.Yuan, K.De Roover, M.Dufner, J.J.A.Denissen, K. Van Deun (in press). Revealing subgroups that differ in common and distinctive variation in multi-block data: Clusterwise Sparse Simultaneous Component Analysis. 
+S.Yuan, K.De Roover, M.Dufner, J.J.A.Denissen, K. Van Deun (2021). Revealing subgroups that differ in common and distinctive variation in multi-block data: Clusterwise Sparse Simultaneous Component Analysis. 
 ```
 
 ## corresponding address
-Issues on the packages could be filed as pull requests (recommended) or sent to s.yuan@uvt.nl. Specific uestions about the code and the method could be addressed at the same email address. 
+Issues on the packages could be filed as pull requests (recommended) or sent to s.yuan@uva.nl. Specific uestions about the code and the method could be addressed at the same email address. 
 
 ## Installation
 To install the Package, make sure that the R package "devtool" and "remotes" have been installed. Then, use the following code to install the Package ClusterSSCA. 
@@ -110,7 +110,7 @@ GPL-2
 
 ## Contact
 
-Shuai Yuan (s.yuan@uvt.nl)
+Shuai Yuan (s.yuan@uva.nl)
 
 ## Scripts to reproduce the results of the manuscript "Revealing subgroups that differ in common and distinctive variation in multi-block data: Clusterwise Sparse Simultaneous Component Analysis"
 **Application Folder**: process data for the demonstrative application of CSSCA on the linked personality measurements and non-verbal behavior data  
